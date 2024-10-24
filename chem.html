@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molecule Visualization</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #moleculeCanvas {
+            border: 1px solid #ccc;
+            background-color: #ffffff;
+            width: 100%;
+            height: 600px;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="moleculeCanvas"></canvas>
+    <div class="button-container">
+        <button id="previousButton" disabled>Previous</button>
+        <button id="nextButton">Next</button>
+    </div>
+
+    <!-- Include OCL.js from CDN -->
+    <script src="https://unpkg.com/openchemlib@latest/dist/openchemlib-full.js"></script>
+
+    <!-- Include local JavaScript files -->
+    <script src="moleculeInfo.js"></script>
+    <script src="moleculeRenderer.js"></script>
+    <script src="bondManipulator.js"></script>
+    <script src="action.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const canvas = document.getElementById('moleculeCanvas');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            const actions = new Actions('moleculeCanvas');
+            actions.renderer.setScaleFactor(60);
+
+            const molecules = [
+                'c1ccc(cc1)[N+](=O)[O-]',  // Nitrobenzene
+                'CCO',  // Ethanol
+            ];
+
+            for (const smiles of molecules) {
+                console.log(`Adding molecule: ${smiles}`);
+                const id = await actions.addMolecule(smiles, true);
+                console.log(`Added molecule with id: ${id}`);
+            }
+
+            const steps = [
+                () => actions.B2A(0, "6-7"),
+                () => actions.B2A(1, "2-1"),
+                () => actions.B2B(0, "2-3-6"),
+                // Add more steps as needed
+            ];
+
+            let currentStep = 0;
+            const stateHistory = [actions.renderer.getMolecules().map(m => m.moleculeInfo.getMolecule().toSmiles())];
+
+            const nextButton = document.getElementById('nextButton');
+            const previousButton = document.getElementById('previousButton');
+
+            nextButton.addEventListener('click', async () => {
+                if (currentStep < steps.length) {
+                    steps[currentStep]();
+                    currentStep++;
+                    stateHistory.push(actions.renderer.getMolecules().map(m => m.moleculeInfo.getMolecule().toSmiles()));
+                    updateButtonStates();
+                }
+            });
+
+            previousButton.addEventListener('click', async () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    stateHistory.pop(); // Remove the current state
+                    const previousState = stateHistory[stateHistory.length - 1];
+                    await actions.resetMolecules(previousState);
+                    updateButtonStates();
+                }
+            });
+
+            function updateButtonStates() {
+                previousButton.disabled = currentStep === 0;
+                nextButton.disabled = currentStep === steps.length;
+            }
+
+            updateButtonStates(); // Initial button state update
+
+            function animate() {
+                actions.renderer.renderMolecules();
+                requestAnimationFrame(animate);
+            }
+            animate(); // Start the animation loop
+        });
+    </script>
+</body>
+</html>

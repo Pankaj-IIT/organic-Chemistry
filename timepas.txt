@@ -1,0 +1,52 @@
+drawMovingElectrons(start, end, progress, electronMovement, transitionInfo) {
+    const ctx = this.ctx;
+    ctx.fillStyle = 'blue';
+    const electronRadius = 2;
+        
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    ctx.save();
+    ctx.translate(start.x, start.y);
+    ctx.rotate(angle);
+
+    const drawElectron = (x, y) => {
+      ctx.beginPath();
+      ctx.arc(x, y, electronRadius, 0, 2 * Math.PI);
+      ctx.fill();
+    };
+
+    const centerX = length / 2;
+    let position;
+
+    if (electronMovement === 'atom-to-bond') {
+      // Move from the start atom to the center of the bond
+      position = centerX * progress;
+    } else if (electronMovement === 'bond-to-atom') {
+        // Move from the center of the bond to the end atom
+        // Check if the target atom is the end atom
+        // Determine if the target atom is the end atom
+        // Determine which coordinate (start or end) belongs to the target atom
+        const targetCoord = transitionInfo.targetAtom === this.moleculeInfo.getAtomIndex(start.x, start.y) ? false: true;
+        console.log(transitionInfo.targetAtom)
+        // Determine if we need to rotate the axes
+        let rotateAxes = false;
+        if (end.x < start.x || (end.x === start.x && end.y > start.y)) {
+            rotateAxes = true;
+        }
+
+        // Apply rotation if necessary
+        if (rotateAxes) {
+            ctx.rotate(Math.PI);
+            position = length - position;
+        }
+        position = centerX + (length - centerX) * progress;
+      }
+    
+
+    drawElectron(position, -3);
+    drawElectron(position, 3);
+
+    ctx.restore();
+  }

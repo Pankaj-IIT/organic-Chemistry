@@ -1,0 +1,83 @@
+# Molecule Visualization Project Help File
+
+## Files Overview
+1. BondManipulator.js
+2. moleculeRenderer.js
+3. moleculeInfo.js
+4. chem.html
+
+## BondManipulator.js
+
+### Class: BondManipulator
+Handles the manipulation of bonds and electron movement animations.
+
+#### Properties:
+- `moleculeInfo`: Instance of MoleculeInfo class
+- `renderer`: Instance of MoleculeRenderer class
+- `manipulatedBonds`: Map to store information about manipulated bonds
+- `initialCharges`: Map to store initial atom charges
+- `finalCharges`: Map to store final atom charges after manipulation
+
+#### Methods:
+- `manipulateBond(bondIdentifier, electronMovement)`: Initiates bond manipulation
+- `startBondTransition(bondIdentifier, initialBondOrder, electronMovement)`: Starts the animation for bond transition
+- `updateAtomCharges(bondIdentifier, progress, electronMovement)`: Updates atom charges during animation
+- `findBondIndex(molecule, atom1, atom2)`: Finds the index of a bond in the molecule
+- `getBondTransitionProgress(atom1, atom2)`: Returns the progress of a bond transition
+
+## moleculeRenderer.js
+
+### Class: MoleculeRenderer
+Handles the rendering of molecules on a canvas.
+
+#### Properties:
+- `canvas`: The HTML canvas element
+- `ctx`: The 2D rendering context of the canvas
+- `moleculeInfo`: Instance of MoleculeInfo class
+- `scaleFactor`: Scaling factor for molecule rendering
+- `currentSmiles`: Current SMILES string of the rendered molecule
+- `atomColors`: Map of atom colors
+- `bondColors`: Map of bond colors
+- `bondManipulator`: Instance of BondManipulator class
+
+#### Methods:
+- `renderMolecule(smiles, showImplicitHydrogens, showAtomNumbers)`: Renders a molecule from SMILES string
+- `drawBond(start, end, bondType, atom1, atom2)`: Draws a bond between two atoms
+- `drawAtom(coord, atomSymbol, atomIndex, showAtomNumbers)`: Draws an atom
+- `drawMolecule(moleculeData, showAtomNumbers)`: Draws the entire molecule
+- `project3Dto2D(coords3D)`: Projects 3D coordinates to 2D for rendering
+
+## moleculeInfo.js
+
+### Class: MoleculeInfo
+Handles molecule information and interactions with OpenChemLib.
+
+#### Properties:
+- `molecule`: The OCL molecule object
+
+#### Methods:
+- `getAtomSymbol(index)`: Returns the symbol of an atom at a given index
+- `getMoleculeInfo(smiles, showImplicitHydrogens)`: Generates molecule information from SMILES
+- `getMolecule()`: Returns the current OCL molecule object
+
+## chem.html
+
+### HTML Structure:
+- Canvas element for molecule rendering
+- Script inclusions for OCL.js and project JavaScript files
+
+### JavaScript:
+- Initializes MoleculeRenderer, MoleculeInfo, and BondManipulator
+- Sets up event listeners for bond manipulation buttons
+
+## Key Variables:
+
+- `smiles`: SMILES string representation of the molecule
+- `electronMovement`: Type of electron movement ('both-to-2' or 'split')
+- `bondIdentifier`: String identifying a bond (e.g., '1-2' for bond between atoms 1 and 2)
+- `progress`: Animation progress (0 to 1)
+- `coordinates3D`: 3D coordinates of atoms
+- `bondTypes`: Information about bond types in the molecule
+
+## Note:
+This project uses OpenChemLib (OCL) for molecular operations. Familiarity with OCL's API is helpful for understanding some of the molecular manipulations.
